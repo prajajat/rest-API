@@ -9,5 +9,5 @@ import java.util.List;
 public class EmployeeResponceDTO {
     private String name;
     private String department;
-
+    private String imagePath;
 }

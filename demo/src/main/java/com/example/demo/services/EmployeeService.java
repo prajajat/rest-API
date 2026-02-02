@@ -83,6 +83,27 @@ public class EmployeeService {
         return ;
     }
 
+    public void updateImagePath(Long id, String path)
+    {
+        Employee emp = employeeRepo.findById(id).orElse(null);
+        if(emp!=null) {
+            emp.setImagePath(path);
+            employeeRepo.save(emp);
+        }else{
+            //runtime ex
+        }
+    }
+    public  EmployeeResponceDTO   partiallyUpdateEmployee (EmployeeRequestDTO dto,long id) {
 
+        Employee emp=employeeRepo.findById(id).orElse(null);
+        if(emp!=null) {
+             modelMapper.map(dto,emp);
+            employeeRepo.save(emp);
+        }
+        else {
+            //runtime ex
+        }
+        return modelMapper.map(dto,EmployeeResponceDTO.class);
+    }
 
 }

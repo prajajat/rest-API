@@ -29,12 +29,12 @@ public class AuthController {
                 .httpOnly(true)
                 .secure(true)
                 .path("/")
-                .sameSite("Strict")
+                .sameSite("Lax")
                 .maxAge(Duration.ofMinutes(90))
                 .build();
 
         responce.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
-        return ResponseEntity.ok(Map.of("message", "Logged in"));
+        return ResponseEntity.ok( "Logged in");
     }
 }
 
