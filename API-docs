@@ -27,6 +27,26 @@
               "type": "integer",
               "format": "int64"
             }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            }
+          },
+          {
+            "name": "x-api-version",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "1"
+              ]
+            }
           }
         ],
         "responses": {
@@ -34,6 +54,11 @@
             "description": "OK",
             "content": {
               "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmployeeResponceDTO"
+                }
+              },
+              "application/vnd.roima.v1+json": {
                 "schema": {
                   "$ref": "#/components/schemas/EmployeeResponceDTO"
                 }
@@ -105,7 +130,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "type": "string"
+                  "type": "object"
                 }
               }
             }
@@ -267,6 +292,29 @@
           "employee-controller"
         ],
         "operationId": "getEmployees",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/EmployeeResponceDTO"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/employee/V1/all": {
+      "get": {
+        "tags": [
+          "employee-controller"
+        ],
+        "operationId": "getEmployeesV1",
         "responses": {
           "200": {
             "description": "OK",
