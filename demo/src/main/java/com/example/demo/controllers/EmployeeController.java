@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import com.example.demo.dtos.responce.EmployeeResponceDTO;
 import com.example.demo.entites.Employee;
 import com.example.demo.services.EmployeeService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -27,24 +28,70 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+
+@Slf4j
 @RestController
 @RequestMapping("/api/employee")
 public class EmployeeController {
+
+
     @Autowired
     private EmployeeService empService;
+
    @Value ("${image.folder}")
    private String imageFolder;
+
+
+   private static final Logger logger=LoggerFactory.getLogger(EmployeeController.class);
+
    @GetMapping("/all")
     public ResponseEntity<List<EmployeeResponceDTO>>getEmployees() {
 
         return ResponseEntity.ok(empService.getallEmployees());
     }
-    @GetMapping("/{id}")
-    public ResponseEntity<EmployeeResponceDTO>getEmployee(@PathVariable long id) {
+    @GetMapping("/V1/all")
+    public ResponseEntity<List<EmployeeResponceDTO>>getEmployeesV1() {
 
-        return ResponseEntity.ok(empService.getEmployeesById(id));
+        return ResponseEntity.ok(empService.getallEmployees());
     }
+    @GetMapping("/{id}")
+    public ResponseEntity<EmployeeResponceDTO>getEmployee(@PathVariable long id,@RequestParam(name = "version",defaultValue = "10") int version) {
+
+       if(version==1)
+       {
+           logger.info("using version 1");
+           return ResponseEntity.ok(empService.getEmployeesById(id));
+       }
+
+       return ResponseEntity.ok(empService.getEmployeesById(id));
+
+    }
+
+
+    @GetMapping(value = "/{id}",headers = "x-api-version=1")
+    public ResponseEntity<EmployeeResponceDTO>getEmployeeHeaderVersioning(@PathVariable long id) {
+
+
+            logger.info("using version 1 from Header");
+            return ResponseEntity.ok(empService.getEmployeesById(id));
+
+
+    }
+
+    @GetMapping(value = "/{id}" ,produces = "application/vnd.roima.v1+json")
+    public ResponseEntity<EmployeeResponceDTO>getEmployeeContentVersioning(@PathVariable long id) {
+
+            logger.info("using version 1 from Content");
+            return ResponseEntity.ok(empService.getEmployeesById(id));
+
+
+
+    }
+
+
     @PostMapping("/")
     public ResponseEntity<EmployeeResponceDTO> createEmployee(@RequestBody @Valid EmployeeRequestDTO dto) {
 
@@ -68,13 +115,13 @@ public class EmployeeController {
         return ResponseEntity.ok(empService.partiallyUpdateEmployee(dto,id));
     }
     @DeleteMapping ("/{id}")
-    public ResponseEntity  deleteEmployee(@PathVariable long id) {
+    public ResponseEntity <?> deleteEmployee(@PathVariable long id) {
         empService.deleteEmployee(id);
         return ResponseEntity.ok("deleted");
     }
 
     @GetMapping("/{id}/image")
-    public ResponseEntity<Resource>getimage(@PathVariable long id, ServletWebRequest request) throws IOException {
+    public ResponseEntity<Resource> getimage(@PathVariable long id, ServletWebRequest request) throws IOException {
 
         String imageName="emp_"+id+".png";
         Path fullImagePath= Paths.get(imageFolder +"\\"+ imageName);
